@@ -1,113 +1,100 @@
 
 //Create the Cart class to work with DigitalVideoDisc
-package aims.cart;
+package hust.soict.vn.aims.cart;
 
-import java.util.Scanner;
+import hust.soict.vn.aims.media.Media;
+import java.util.Collections;
 
-import aims.disc.DigitalVideoDisc;
+import java.util.ArrayList;
 public class Cart {
+
     public static final int MAX_NUMBERS_ORDERED = 20;
-    private DigitalVideoDisc itemsOrdered[] = new DigitalVideoDisc[MAX_NUMBERS_ORDERED];
-    private int qtyOrdered = 0;
 
-    //Method to add an item to the list
-    public void addDigitalVideoDisc(DigitalVideoDisc disc) {
-        if(qtyOrdered <= MAX_NUMBERS_ORDERED) {
-            itemsOrdered[qtyOrdered] = disc;
-            qtyOrdered++;
-            System.out.println("The disc with name "+disc.getTitle()+" has been added!");
+    private ArrayList<Media> itemsOrdered = new ArrayList<Media>();
 
-        }
-        else {
-            System.out.println("The cart is almost full");
-        }
-    }
-
-    //Create method addDigitalVideoDisc with numbers of argument
-    public void addDigitalVideoDisc(DigitalVideoDisc... dvdList) {
-        if (qtyOrdered + dvdList.length > MAX_NUMBERS_ORDERED) {
+    public void addMedia(Media media) {
+        if (itemsOrdered.size() == MAX_NUMBERS_ORDERED) {
             System.out.println("The cart is full.");
+        } else if (itemsOrdered.contains(media)) {
+            System.out.println("Media already in cart.");
         } else {
-            for (DigitalVideoDisc dvd : dvdList) {
-                addDigitalVideoDisc(dvd);
-            }
+            itemsOrdered.add(media);
+            System.out.println("Added " + media.toString() + " to cart.");
         }
-    }
-    // Create method addDigitalVideoDisc has 2 parameters
-    public void addDigitalVideoDisc(DigitalVideoDisc dvd1, DigitalVideoDisc dvd2) {
-        addDigitalVideoDisc(new DigitalVideoDisc[] { dvd1, dvd2 });
+        System.out.println("Current number of items in cart: " + itemsOrdered.size());
     }
 
-    //Method which loops through the values of the array and sums the costs of the individual DigitalVideoDiscs
-    public float totalCost(){
-        float sum = 0;
-        for (int i = 0 ; i < qtyOrdered ; i++){
-            sum += itemsOrdered[i].getCost();
-        }
-        return sum;
-    }
-
-    //Method to remove the item
-    public void removeDigitalVideoDisc(DigitalVideoDisc disc) {
-        boolean found = false;
-        for (int i=0; i<qtyOrdered; i++) {
-            if (itemsOrdered[i] == disc) {
-                found = true;
-                for (int j=i; j<qtyOrdered-1; j++) {
-                    itemsOrdered[j] = itemsOrdered[j+1];
-                }
-                qtyOrdered--;
-                itemsOrdered[qtyOrdered] = null;
-                System.out.println("The disc \"" + disc.getTitle() + "\" has been removed.");
-            }
-        }
-
-        if (!found) {
-            System.out.println("Couldn't find the specified disc.");
+    public void removeMedia(Media media) {
+        if (itemsOrdered.remove(media)) {
+            System.out.println("Removed " + media.toString() + " from cart.");
+        } else {
+            System.out.println("Couldn't find this item.");
         }
     }
 
-    //Method to print order
-    public void printorder() {
-        System.out.println("***********************CART***********************");
+    public float totalCost() {
+        float cost = 0;
+        for (Media m : itemsOrdered) {
+            cost += m.getCost();
+        }
+        return cost;
+    }
+
+    public void print() {
+        System.out.println("\n***********************CART***********************");
         System.out.println("Ordered Items:");
-        for (int i = 0; i < qtyOrdered; i++) {
-            System.out.println((i + 1) + ". " + itemsOrdered[i].toString());
+        for (int i = 0; i < itemsOrdered.size(); i++) {
+            System.out.println((i + 1) + ". " + itemsOrdered.get(i).toString());
         }
         System.out.println("Total cost: " + totalCost() + " $");
         System.out.println("**************************************************");
     }
 
-    //Search by ID
-    public boolean searchId() {
-        Scanner keyboard = new Scanner(System.in);
-        System.out.println("Search results for ID: ");
-        int id = keyboard.nextInt();
-        for (int i = 0; i < qtyOrdered; i++) {
-            if (itemsOrdered[i].getId() == id) {
-                System.out.println(itemsOrdered[i].toString());
-                return true;
+    public void searchById(int id) {
+        System.out.println("Search results for ID: " + id);
+        for (Media m : itemsOrdered) {
+            if (m.getId() == id) {
+                System.out.println(m.toString());
+                return;
             }
         }
         System.out.println("No items found.");
-        return false;
     }
 
-    //Search by Title
-    public boolean searchTitle() {
+    public void searchByTitle(String title) {
         boolean found = false;
-        Scanner keyboard = new Scanner(System.in);
-        System.out.println("Search results for title: ");
-        String title = keyboard.nextLine();
-        for (int i = 0; i < qtyOrdered; i++) {
-            if (itemsOrdered[i].isMatch(title)) {
-                System.out.println( itemsOrdered[i].toString());
+        System.out.println("Search results for keywords: " + title);
+        for (Media m : itemsOrdered) {
+            if (m.isMatch(title)) {
+                System.out.println(m.toString());
                 found = true;
             }
         }
         if (!found)
             System.out.println("No items found.");
-        return found;
+    }
+    public void sortByTitle() {
+        Collections.sort(itemsOrdered, Media.COMPARE_BY_TITLE_COST);
     }
 
+    public void sortByCost() {
+       Collections.sort(itemsOrdered, Media.COMPARE_BY_COST_TITLE);
+   }
+    public Media fetchMedia(String title) {
+        for (Media m : itemsOrdered) {
+            if (m.isMatch(title))
+                return m;
+        }
+        return null;
+    }
+
+    public void placeOrder() {
+        if (itemsOrdered.isEmpty()) {
+            System.out.println("The cart is empty.");
+            return;
+        }
+
+        itemsOrdered.clear();
+        System.out.println("Your order has been placed.");
+    }
 }

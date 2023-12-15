@@ -1,34 +1,39 @@
-package aims.store;
-import aims.disc.DigitalVideoDisc;
-public class Store {
-    public static final int MAX_CAPACITY = 1000;
-    private DigitalVideoDisc[] itemsInStore = new DigitalVideoDisc[MAX_CAPACITY];
-    private int numberDVD;
+package hust.soict.vn.aims.store;
 
-    public void addDVD(DigitalVideoDisc dvd) {
-        if (numberDVD + 1 > MAX_CAPACITY) {
-            System.out.println("Cannot add DVD: Store's max capacity reached.");
-            return;
+import hust.soict.vn.aims.media.Media;
+
+import java.util.ArrayList;
+public class Store {
+
+    private ArrayList<Media> itemsInStore = new ArrayList<Media>();
+    public void addMedia(Media media) {
+        if (itemsInStore.contains(media)) {
+            System.out.println("Item already in store.");
+        } else {
+            itemsInStore.add(media);
+            System.out.println("Added " + media.toString() + " to store.");
         }
-        itemsInStore[numberDVD++] = dvd;
-        System.out.println("Added " + dvd.toString() + " to store.");
+    }
+    public void removeMedia(Media media) {
+        if (itemsInStore.remove(media)) {
+            System.out.println("Removed " + media.toString() + " from store.");
+        } else {
+            System.out.println("Couldn't find this item.");
+        }
     }
 
-    public void removeDVD(DigitalVideoDisc dvd) {
-        boolean found = false;
-
-        for (int i = 0; i < numberDVD; i++) {
-            if (itemsInStore[i].equals(dvd)) {
-                found = true;
-                for (int j = i; j < numberDVD - 1; j++) {
-                    itemsInStore[j] = itemsInStore[j + 1];
-                }
-                itemsInStore[--numberDVD] = null;
-                System.out.println("Removed " + dvd.toString() + " from store.");
-            }
+    public void displayItems() {
+        System.out.println("\n***********************STORE***********************");
+        for (Media m: itemsInStore) {
+            System.out.println(m.toString());
         }
-
-        if (!found)
-            System.out.println("No item matches.");
+        System.out.println("***************************************************");
+    }
+    public Media fetchMedia(String title) {
+        for (Media m : itemsInStore) {
+            if (m.isMatch(title))
+                return m;
+        }
+        return null;
     }
 }
